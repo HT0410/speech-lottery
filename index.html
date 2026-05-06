@@ -29,7 +29,7 @@
       min-height: 100vh;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      padding: 44px 20px; overflow-x: hidden;
+      padding: 72px 20px; overflow-x: hidden;
     }
     body::before {
       content: ''; position: fixed; inset: 0;
@@ -263,13 +263,13 @@
       100% { transform:translate(var(--tx),var(--ty)) scale(0); opacity:0; }
     }
 
-    html:fullscreen body { padding: 32px 22px; }
+    html:fullscreen body { padding: 56px 22px; }
     html:fullscreen #lottery-view,
     html:fullscreen .tv-inner { max-width: 1080px; }
 
     @media (max-width: 640px) {
       html { font-size: 15px; }
-      body { padding: 28px 14px; }
+      body { padding: 44px 14px; }
       #lottery-view { gap: 22px; }
       h1 { font-size: 2rem; }
       #odai-display { padding: 38px 24px; min-height: 190px; }
