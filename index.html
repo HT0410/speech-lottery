@@ -21,6 +21,8 @@
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html { font-size: 18px; }
+
     body {
       font-family: 'Zen Kaku Gothic New', sans-serif;
       background: var(--bg); color: var(--text);
@@ -40,25 +42,25 @@
     /* ===================== LOTTERY VIEW ===================== */
     #lottery-view {
       position: relative; z-index: 1;
-      width: 100%; max-width: 700px;
-      display: flex; flex-direction: column; gap: 20px;
+      width: 100%; max-width: 920px;
+      display: flex; flex-direction: column; gap: 24px;
     }
 
     header { text-align: center; }
     .label {
       display: inline-block; font-family: 'DM Mono', monospace;
-      font-size: 10px; letter-spacing: .18em; color: var(--accent);
-      border: 1px solid var(--accent); padding: 3px 11px;
+      font-size: .72rem; letter-spacing: .18em; color: var(--accent);
+      border: 1px solid var(--accent); padding: 5px 14px;
       border-radius: 100px; margin-bottom: 12px; text-transform: uppercase;
     }
-    h1 { font-size: clamp(20px,4.5vw,30px); font-weight: 900; letter-spacing:-.01em; line-height:1.2; }
+    h1 { font-size: 2.45rem; font-weight: 900; letter-spacing:-.01em; line-height:1.18; }
     h1 span { color: var(--accent); }
-    .meta { margin-top:6px; font-size:12px; color:var(--muted); font-family:'DM Mono',monospace; }
+    .meta { margin-top:8px; font-size:.9rem; color:var(--muted); font-family:'DM Mono',monospace; }
 
     #category-badge {
-      display: inline-block; font-size:11px; font-family:'DM Mono',monospace;
-      letter-spacing:.09em; padding:4px 13px; border-radius:100px;
-      background:var(--border); color:var(--muted); transition:all .35s; margin-bottom:8px;
+      display: inline-block; font-size:.82rem; font-family:'DM Mono',monospace;
+      letter-spacing:.09em; padding:6px 16px; border-radius:100px;
+      background:var(--border); color:var(--muted); transition:all .35s; margin-bottom:12px;
     }
     #category-badge.active { background:rgba(245,200,66,.13); color:var(--accent); border:1px solid rgba(245,200,66,.3); }
 
@@ -75,16 +77,16 @@
 
     #odai-display {
       background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
-      padding:32px 28px; min-height:150px;
+      padding:44px 40px; min-height:230px;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
       text-align:center; gap:10px; transition:border-color .3s, box-shadow .3s;
     }
     #odai-display.rolling { border-color:var(--accent); box-shadow:0 0 36px rgba(245,200,66,.11),inset 0 0 50px rgba(245,200,66,.04); }
     #odai-display.decided { border-color:var(--teal); box-shadow:0 0 44px rgba(78,205,196,.16),inset 0 0 50px rgba(78,205,196,.04); }
-    .odai-text { font-size:clamp(16px,3.2vw,22px); font-weight:700; line-height:1.7; color:var(--text); transition:color .3s; }
-    #odai-display.rolling .odai-text { color:rgba(245,200,66,.8); font-family:'DM Mono',monospace; font-size:clamp(13px,2.5vw,17px); }
+    .odai-text { font-size:1.85rem; font-weight:700; line-height:1.65; color:var(--text); transition:color .3s; }
+    #odai-display.rolling .odai-text { color:rgba(245,200,66,.8); font-family:'DM Mono',monospace; font-size:1.35rem; }
     #odai-display.decided .odai-text { color:#fff; }
-    .placeholder-text { color:var(--muted); font-size:15px; }
+    .placeholder-text { color:var(--muted); font-size:1.35rem; }
     @keyframes pop-in { 0%{transform:scale(.9);opacity:0} 65%{transform:scale(1.03)} 100%{transform:scale(1);opacity:1} }
     .decided .odai-text { animation:pop-in .42s cubic-bezier(.34,1.56,.64,1) forwards; }
 
@@ -103,14 +105,14 @@
     button:disabled { opacity:.38; cursor:not-allowed; }
 
     #draw-btn {
-      flex:1; padding:17px 28px; font-size:16px;
+      flex:1; padding:22px 32px; font-size:1.18rem;
       background:var(--accent); color:#0d0f1a;
       box-shadow:0 4px 22px rgba(245,200,66,.28);
     }
     #draw-btn:hover:not(:disabled) { box-shadow:0 6px 30px rgba(245,200,66,.48); transform:translateY(-1px); }
 
     #skip-btn {
-      padding:17px 20px; font-size:14px;
+      padding:22px 24px; font-size:1rem;
       background:var(--surface); color:var(--muted);
       border:1px solid var(--border); display:none;
     }
@@ -120,22 +122,31 @@
     /* コンパクトタイマーバー（抽選画面下部） */
     .timer-bar {
       background:var(--surface); border:1px solid var(--border);
-      border-radius:var(--radius); padding:16px 20px;
-      display:flex; align-items:center; gap:14px;
+      border-radius:var(--radius); padding:20px 24px;
+      display:flex; align-items:center; gap:18px;
     }
     .timer-bar-digits {
-      font-family:'DM Mono',monospace; font-size:28px; font-weight:500;
-      color:var(--teal); flex-shrink:0; min-width:70px;
+      font-family:'DM Mono',monospace; font-size:2.25rem; font-weight:500;
+      color:var(--teal); flex-shrink:0; min-width:96px;
     }
-    .timer-bar-label { font-size:12px; color:var(--muted); flex:1; line-height:1.5; }
+    .timer-bar-label { font-size:1rem; color:var(--muted); flex:1; line-height:1.5; }
     #start-small-btn {
-      padding:12px 22px; font-size:14px;
+      padding:16px 28px; font-size:1rem;
       background:rgba(78,205,196,.15); color:var(--teal);
       border:1px solid rgba(78,205,196,.3);
     }
     #start-small-btn:hover:not(:disabled) { background:rgba(78,205,196,.25); box-shadow:0 0 16px rgba(78,205,196,.2); }
 
-    #lottery-footer { text-align:center; font-size:12px; color:var(--muted); font-family:'DM Mono',monospace; }
+    #lottery-footer { text-align:center; font-size:.9rem; color:var(--muted); font-family:'DM Mono',monospace; }
+
+    #fullscreen-btn {
+      position: fixed; top: 16px; right: 16px; z-index: 200;
+      padding: 12px 18px; font-size: .95rem;
+      background: rgba(22,25,41,.86); color: var(--text);
+      border: 1px solid var(--border); border-radius: 999px;
+      backdrop-filter: blur(8px);
+    }
+    #fullscreen-btn:hover { background: var(--border); }
 
     /* ===================== TIMER VIEW ===================== */
     #timer-view {
@@ -159,27 +170,27 @@
 
     .tv-inner {
       position: relative; z-index: 1;
-      width: 100%; max-width: 680px;
+      width: 100%; max-width: 920px;
       display: flex; flex-direction: column; align-items: center; gap: 28px;
     }
 
     /* タイマービュー上部：お題ミニ表示 */
     .tv-odai-mini {
       background:var(--surface); border:1px solid var(--border);
-      border-radius:12px; padding:16px 24px;
+      border-radius:12px; padding:22px 30px;
       text-align:center; width:100%;
     }
     .tv-odai-mini .mini-cat {
-      font-size:10px; font-family:'DM Mono',monospace; letter-spacing:.12em;
-      color:var(--muted); text-transform:uppercase; margin-bottom:6px;
+      font-size:.8rem; font-family:'DM Mono',monospace; letter-spacing:.12em;
+      color:var(--muted); text-transform:uppercase; margin-bottom:10px;
     }
     .tv-odai-mini .mini-text {
-      font-size:clamp(14px,2.5vw,18px); font-weight:700; line-height:1.6; color:var(--text);
+      font-size:1.65rem; font-weight:700; line-height:1.55; color:var(--text);
     }
 
     /* 大きな円形タイマー */
     .tv-ring-wrap {
-      position: relative; width: clamp(220px,55vw,300px); height: clamp(220px,55vw,300px);
+      position: relative; width: 360px; height: 360px;
     }
     .tv-ring-wrap svg { transform:rotate(-90deg); width:100%; height:100%; }
     #tv-ring-bg   { stroke:var(--border); }
@@ -195,7 +206,7 @@
       display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
     }
     #tv-digits {
-      font-family:'DM Mono',monospace; font-size:clamp(52px,14vw,80px); font-weight:500;
+      font-family:'DM Mono',monospace; font-size:5.9rem; font-weight:500;
       letter-spacing:-.03em; transition:color .4s;
       line-height:1;
     }
@@ -204,7 +215,7 @@
     @keyframes tv-blink { to { opacity:.35; } }
 
     #tv-phase-label {
-      font-size:13px; font-family:'DM Mono',monospace; letter-spacing:.1em;
+      font-size:1rem; font-family:'DM Mono',monospace; letter-spacing:.1em;
       color:var(--muted); text-transform:uppercase; transition:color .4s;
     }
 
@@ -216,7 +227,7 @@
       100%  { opacity:0; transform:scale(1); }
     }
     #milestone-msg {
-      font-family:'DM Mono',monospace; font-size:clamp(13px,3vw,16px);
+      font-family:'DM Mono',monospace; font-size:1.2rem;
       letter-spacing:.1em; color:var(--accent);
       min-height:24px; text-align:center;
       opacity:0; text-transform:uppercase;
@@ -226,7 +237,7 @@
     /* タイマービューボタン群 */
     .tv-btn-row { display:flex; gap:12px; width:100%; }
     #tv-pause-btn {
-      flex:1; padding:16px; font-size:16px;
+      flex:1; padding:20px; font-size:1.12rem;
       background:rgba(78,205,196,.15); color:var(--teal);
       border:1px solid rgba(78,205,196,.3);
     }
@@ -236,7 +247,7 @@
       border-color:rgba(245,200,66,.3);
     }
     #tv-stop-btn {
-      padding:16px 22px; font-size:14px;
+      padding:20px 28px; font-size:1rem;
       background:var(--surface); color:var(--muted);
       border:1px solid var(--border);
     }
@@ -251,9 +262,30 @@
       0%   { transform:translate(0,0) scale(1); opacity:1; }
       100% { transform:translate(var(--tx),var(--ty)) scale(0); opacity:0; }
     }
+
+    html:fullscreen body { padding: 18px; }
+    html:fullscreen #lottery-view,
+    html:fullscreen .tv-inner { max-width: 1080px; }
+
+    @media (max-width: 640px) {
+      html { font-size: 15px; }
+      body { padding: 18px 12px; }
+      #lottery-view { gap: 18px; }
+      h1 { font-size: 2rem; }
+      #odai-display { padding: 30px 22px; min-height: 170px; }
+      .odai-text { font-size: 1.35rem; }
+      .timer-bar { flex-wrap: wrap; }
+      .timer-bar-label { min-width: 100%; order: -1; }
+      #start-small-btn { flex: 1; }
+      .tv-ring-wrap { width: 280px; height: 280px; }
+      #tv-digits { font-size: 4.6rem; }
+      .tv-odai-mini .mini-text { font-size: 1.25rem; }
+    }
   </style>
 </head>
 <body>
+
+<button id="fullscreen-btn" type="button" onclick="toggleFullscreen()">全画面</button>
 
 <!-- ===== 抽選ビュー ===== -->
 <div id="lottery-view">
@@ -588,10 +620,26 @@ const footerEl = document.getElementById('lottery-footer');
 const barDigits= document.getElementById('bar-digits');
 const barLabel = document.getElementById('bar-label');
 const startSmallBtn = document.getElementById('start-small-btn');
+const fullscreenBtn = document.getElementById('fullscreen-btn');
 
 let isRolling=false, finalOdai=null, lotteryDone=false;
 const TOTAL=90, INTERVAL=52;
 let intervalId=null;
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {
+      fullscreenBtn.textContent = '全画面にできません';
+      setTimeout(() => fullscreenBtn.textContent = '全画面', 1800);
+    });
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+document.addEventListener('fullscreenchange', () => {
+  fullscreenBtn.textContent = document.fullscreenElement ? '全画面解除' : '全画面';
+});
 
 function setDisplay(odai) {
   display.innerHTML=`<p class="odai-text">${odai.text}</p>`;
