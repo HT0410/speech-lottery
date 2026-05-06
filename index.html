@@ -641,6 +641,13 @@ document.addEventListener('fullscreenchange', () => {
   fullscreenBtn.textContent = document.fullscreenElement ? '全画面解除' : '全画面';
 });
 
+document.addEventListener('keydown', (event) => {
+  if (event.key.toLowerCase() !== 'f') return;
+  if (event.metaKey || event.ctrlKey || event.altKey) return;
+  event.preventDefault();
+  toggleFullscreen();
+});
+
 function setDisplay(odai) {
   display.innerHTML=`<p class="odai-text">${odai.text}</p>`;
   const col=catColors[odai.cat]||'#fff';
