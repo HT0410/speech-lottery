@@ -64,6 +64,18 @@
     }
     #category-badge.active { background:rgba(245,200,66,.13); color:var(--accent); border:1px solid rgba(245,200,66,.3); }
 
+    .filter-row {
+      display:flex; flex-wrap:wrap; gap:8px; justify-content:center;
+    }
+    .filter-chip {
+      font-family:'DM Mono',monospace; font-size:.78rem; letter-spacing:.03em;
+      padding:8px 16px; border-radius:100px; cursor:pointer;
+      background:var(--surface); color:var(--muted); border:1px solid var(--border);
+      transition:all .2s;
+    }
+    .filter-chip:hover { color:var(--text); border-color:var(--muted); }
+    .filter-chip.active { color:#0d0f1a; border-color:transparent; font-weight:700; }
+
     .display-wrap { position: relative; }
     .display-wrap::before, .display-wrap::after {
       content:''; position:absolute; width:18px; height:18px;
@@ -295,6 +307,8 @@
     <h1>3分間スピーチ<br><span>お題抽選器</span></h1>
     <p class="meta" id="count-meta">— loading —</p>
   </header>
+
+  <div class="filter-row" id="filter-row"></div>
 
   <div class="display-wrap" id="display-wrap">
     <div id="category-badge">CATEGORY</div>
@@ -629,7 +643,8 @@ function playTimerEnd() { playJikouLong(4.0); }
 // =============================================
 //  状態
 // =============================================
-document.getElementById('count-meta').textContent = `全 ${odaiList.length} パターン収録`;
+const countMeta = document.getElementById('count-meta');
+const filterRow = document.getElementById('filter-row');
 
 const display  = document.getElementById('odai-display');
 const badge    = document.getElementById('category-badge');
@@ -647,6 +662,40 @@ const fullscreenBtn = document.getElementById('fullscreen-btn');
 let isRolling=false, finalOdai=null, lotteryDone=false;
 const TOTAL=90, INTERVAL=52;
 let intervalId=null;
+
+// =============================================
+//  カテゴリ絞り込み
+// =============================================
+const categories = [...new Set(odaiList.map(o => o.cat))];
+let currentCategory = 'アイスブレイク'; // 最初のラウンドはアイスブレイクから
+
+function currentPool() {
+  return currentCategory === 'すべて'
+    ? odaiList
+    : odaiList.filter(o => o.cat === currentCategory);
+}
+
+function renderFilterChips() {
+  const items = ['すべて', ...categories];
+  filterRow.innerHTML = items.map(cat => {
+    const col = cat === 'すべて' ? '#eef0ff' : (catColors[cat] || '#eef0ff');
+    const active = cat === currentCategory;
+    const style = active
+      ? `background:${col};border-color:${col};box-shadow:0 0 14px ${col}55;`
+      : '';
+    return `<button type="button" class="filter-chip${active ? ' active' : ''}" style="${style}" data-cat="${cat}">${cat}</button>`;
+  }).join('');
+  countMeta.textContent = `${currentCategory === 'すべて' ? '全' : currentCategory + ' '}${currentPool().length} パターン収録`;
+}
+
+filterRow.addEventListener('click', (e) => {
+  const btn = e.target.closest('.filter-chip');
+  if (!btn || isRolling) return;
+  currentCategory = btn.dataset.cat;
+  renderFilterChips();
+});
+
+renderFilterChips();
 
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
@@ -699,7 +748,8 @@ function skipAnimation() {
 
 function drawOdai() {
   if(isRolling) return; isRolling=true; lotteryDone=false;
-  finalOdai=odaiList[Math.floor(Math.random()*odaiList.length)];
+  const pool=currentPool();
+  finalOdai=pool[Math.floor(Math.random()*pool.length)];
   display.classList.remove('decided'); display.classList.add('rolling');
   wrap.classList.add('rolling'); badge.classList.remove('active');
   badge.textContent='抽選中...'; badge.style.cssText='';
@@ -710,7 +760,7 @@ function drawOdai() {
 
   let count=0, beatPh=0;
   intervalId=setInterval(()=>{
-    const r=odaiList[Math.floor(Math.random()*odaiList.length)];
+    const r=pool[Math.floor(Math.random()*pool.length)];
     display.innerHTML=`<p class="odai-text">${r.text}</p>`; count++;
     progBar.style.width=`${(count/TOTAL)*100}%`;
     const progress=count/TOTAL, every=Math.max(1,Math.round(1+progress*6));
