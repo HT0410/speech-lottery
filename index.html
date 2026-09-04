@@ -372,105 +372,15 @@
 
 <script>
 // =============================================
-//  お題リスト（就職・キャリア特化版）
+//  お題データはサーバー側(server/draw.php)のみが保持する。
+//  ここにはカテゴリ名と表示色だけを置き、お題本文は一切含めない。
 // =============================================
-const odaiList = [
-  { cat:"アイスブレイク", text:"好きな食べ物とその理由を教えて。" },
-  { cat:"アイスブレイク", text:"最近ハマっていること・マイブームは？" },
-  { cat:"アイスブレイク", text:"出身地のおすすめスポットや自慢できるところは？" },
-  { cat:"アイスブレイク", text:"休日はどんな風に過ごしている？" },
-  { cat:"アイスブレイク", text:"好きな色とその理由を教えて。" },
-  { cat:"アイスブレイク", text:"子供の頃になりたかった職業は？" },
-  { cat:"アイスブレイク", text:"好きな映画・ドラマ・アニメを一つ紹介して。" },
-  { cat:"アイスブレイク", text:"得意料理、または好きな料理は？" },
-  { cat:"アイスブレイク", text:"朝型？夜型？その理由も教えて。" },
-  { cat:"アイスブレイク", text:"旅行してみたい場所はどこ？" },
-  { cat:"アイスブレイク", text:"尊敬する人・憧れの人について話して。" },
-  { cat:"アイスブレイク", text:"最近笑ったエピソードを教えて。" },
-  { cat:"アイスブレイク", text:"ペットや好きな動物について話して。" },
-  { cat:"アイスブレイク", text:"好きな音楽・アーティストを紹介して。" },
-  { cat:"アイスブレイク", text:"一つだけ得意なこと・自慢できることは？" },
-  { cat:"アイスブレイク", text:"この訓練校に入ったきっかけは？" },
-  { cat:"アイスブレイク", text:"イラストレーターを2日間触ってみた感想は？" },
-  { cat:"アイスブレイク", text:"フォトショップを2日間触ってみた感想は？" },
-  { cat:"アイスブレイク", text:"この訓練で一番楽しみにしていることは？" },
-  { cat:"アイスブレイク", text:"今の目標を一言で話して。" },
-  { cat:"キャリア", text:"5年後の自分は、どんなエンジニア／デザイナーになっていたい？" },
-  { cat:"キャリア", text:"仕事において一番大切にしたい「譲れない条件」は何？" },
-  { cat:"キャリア", text:"あなたにとって「プロフェッショナル」とは何か、具体的に定義して。" },
-  { cat:"キャリア", text:"在宅勤務（リモート）と出社、自分に合っているのはどっち？理由も添えて。" },
-  { cat:"キャリア", text:"「納期」と「クオリティ」、究極の選択を迫られたらどうする？" },
-  { cat:"キャリア", text:"スペシャリストとジェネラリスト、どちらを目指したいか。" },
-  { cat:"キャリア", text:"働く目的は「生活のため」？それとも「自己実現」？" },
-  { cat:"キャリア", text:"AIに奪われない「自分だけの武器」は何だと思う？" },
-  { cat:"キャリア", text:"副業を認める会社と認めない会社、どちらに魅力を感じる？" },
-  { cat:"キャリア", text:"「ワークライフバランス」についての自分なりの考えを話して。" },
-  { cat:"キャリア", text:"理想の職場環境（文化・制度・雰囲気）をプレゼンして。" },
-  { cat:"キャリア", text:"会社選びで「給料」以外に重視しているポイントは？" },
-  { cat:"キャリア", text:"10年後のIT・Web業界はどうなっていると思う？" },
-  { cat:"キャリア", text:"仕事における「やりがい」はどんな瞬間に生まれると思う？" },
-  { cat:"キャリア", text:"仕事で大失敗した時、どうやって立ち直るか？" },
-  { cat:"キャリア", text:"企業理念（ミッション・ビジョン）はどこまで重視して会社を選ぶ？" },
-  { cat:"キャリア", text:"転職回数についてどう考える？多い・少ないのボーダーラインは？" },
-  { cat:"就職活動", text:"もし今の自分が採用担当なら、自分を採用するか？理由も含めて。" },
-  { cat:"就職活動", text:"履歴書には書けない、自分の隠れた強みとは何だろう？" },
-  { cat:"就職活動", text:"就職活動中にモチベーションを維持するための工夫は？" },
-  { cat:"就職活動", text:"第一志望の会社に落ちた時、どう気持ちを切り替える？" },
-  { cat:"就職活動", text:"面接の「自己紹介」を30秒でやってみよう。" },
-  { cat:"就職活動", text:"面接で「最後に質問はありますか？」と言われたら何を聞く？" },
-  { cat:"就職活動", text:"自分の短所を、面接でどう長所に変換して伝えている？" },
-  { cat:"就職活動", text:"志望動機に「安定」を求めることはアリ？ナシ？" },
-  { cat:"就職活動", text:"就活における「自分のキャッチコピー」を考えて発表してみて。" },
-  { cat:"就職活動", text:"オンライン面接で特に気をつけていることは？" },
-  { cat:"就職活動", text:"ポートフォリオで一番こだわったポイント、または今後こだわりたい点は？" },
-  { cat:"就職活動", text:"IT・Web業界の「ブラック企業」をどう見分ける？" },
-  { cat:"就職活動", text:"就職後の「最初の1ヶ月」で成し遂げたいことは？" },
-  { cat:"就職活動", text:"初出社の前夜、何を準備する？どんな気持ちで臨む？" },
-  { cat:"就職活動", text:"自分の市場価値を上げるために、今できることは何か？" },
-  { cat:"スキル・学習", text:"プログラミングまたはデザインの学習で、一番苦労していることは？" },
-  { cat:"スキル・学習", text:"新しい技術を学ぶ際、どのように情報収集している？" },
-  { cat:"スキル・学習", text:"資格取得と実務経験、どちらが重要だと思う？" },
-  { cat:"スキル・学習", text:"「学び続けること」の難しさと楽しさを語って。" },
-  { cat:"スキル・学習", text:"今の自分に一番足りない「スキル」を一つ挙げるとしたら？" },
-  { cat:"スキル・学習", text:"インプットとアウトプット、理想の比率はどれくらいか？" },
-  { cat:"スキル・学習", text:"Webデザイン・プログラミングの「楽しさ」を、未経験者に伝えるとしたら？" },
-  { cat:"スキル・学習", text:"良いWebサイトの条件を、あなたの言葉で定義して。" },
-  { cat:"スキル・学習", text:"効率化のために最近導入したツールや習慣は？" },
-  { cat:"スキル・学習", text:"言語化能力を鍛えるために実践していることは？" },
-  { cat:"スキル・学習", text:"未経験という「弱み」を、どうカバーするか。" },
-  { cat:"スキル・学習", text:"IT業界の最新ニュースで、最近気になったトピックは？" },
-  { cat:"スキル・学習", text:"デザインの「正解」はどうやって判断する？" },
-  { cat:"スキル・学習", text:"プレゼン力を高めるために意識していることは？" },
-  { cat:"チーム・人間関係", text:"チーム開発で意見が対立した時、どう振る舞うべきか？" },
-  { cat:"チーム・人間関係", text:"良いリーダーに必要な条件とは何か。" },
-  { cat:"チーム・人間関係", text:"「報・連・相」の中で最も重要なのはどれ？その理由は？" },
-  { cat:"チーム・人間関係", text:"「コミュニケーション能力」を自分なりに定義してください。" },
-  { cat:"チーム・人間関係", text:"苦手なタイプの人とペアを組むことになったら、どう対処する？" },
-  { cat:"チーム・人間関係", text:"「主体性がある」とは、具体的にどんな行動のことか？" },
-  { cat:"チーム・人間関係", text:"「聞き上手」になるために大切なことは何か。" },
-  { cat:"チーム・人間関係", text:"仕事で「NO」と言うべき場面はどんな時か？" },
-  { cat:"チーム・人間関係", text:"意見が全く異なる相手と、どうやって合意形成する？" },
-  { cat:"チーム・人間関係", text:"「指示待ち人間」にならないために、何ができるか。" },
-  { cat:"チーム・人間関係", text:"技術的な壁にぶつかった時、何分で誰かに相談すべきか？" },
-  { cat:"チーム・人間関係", text:"理想のメンター（師匠）像とはどんな人か？" },
-  { cat:"チーム・人間関係", text:"逆に、どんな上司や先輩の下では働きたくないか？" },
-  { cat:"チーム・人間関係", text:"職場の人間関係を円滑にするために意識できることは？" },
-  { cat:"自己分析", text:"自分の性格を「プログラミング言語」に例えると何？その理由は？" },
-  { cat:"自己分析", text:"自分の強みを「漢字一文字」で表し、その理由を語って。" },
-  { cat:"自己分析", text:"「柔軟性がある」と言えるエピソードを一つ教えて。" },
-  { cat:"自己分析", text:"これまでで一番の「成功体験」を、学べたことも含めて語って。" },
-  { cat:"自己分析", text:"挫折した時に自分に掛ける言葉や、立ち直り方のルーティンは？" },
-  { cat:"自己分析", text:"一番「集中力」を発揮できる状況や時間帯はいつ？" },
-  { cat:"自己分析", text:"プレッシャーを楽しめるタイプか、苦手なタイプか。その理由は？" },
-  { cat:"自己分析", text:"この訓練を通じて、一番「成長した」と感じるポイントは？" },
-  { cat:"自己分析", text:"自分が会社に貢献できる「最大のこと」は何か？" },
-  { cat:"自己分析", text:"「謙虚さ」と「自信」、仕事ではどちらがより重要か。" },
-  { cat:"自己分析", text:"「誠実さ」を仕事の場でどう具体的に表現するか。" },
-  { cat:"自己分析", text:"仕事上のストレスを溜め込まないために実践していることは？" },
-  { cat:"自己分析", text:"座右の銘と、それが仕事にどう活きると思うかを語って。" },
-  { cat:"自己分析", text:"自分を採用する企業にとって、最大のメリットを売り込んでみて。" },
-  { cat:"自己分析", text:"今の自分に正直に向き合って、一番強化すべき点は何か。" },
-];
+
+// ロリポップにアップロードした draw.php の実際のURLに書き換えてください
+const API_BASE = 'https://YOUR-ACCOUNT.lolipop.jp/speech-lottery/draw.php';
+
+const categories = ["アイスブレイク","キャリア","就職活動","スキル・学習","チーム・人間関係","自己分析"];
+
 
 const catColors = {
   "アイスブレイク":  "#38bdf8",
@@ -664,16 +574,10 @@ const TOTAL=90, INTERVAL=52;
 let intervalId=null;
 
 // =============================================
-//  カテゴリ絞り込み
+//  カテゴリ絞り込み（件数はサーバーに問い合わせる。本文は取得しない）
 // =============================================
-const categories = [...new Set(odaiList.map(o => o.cat))];
 let currentCategory = 'アイスブレイク'; // 最初のラウンドはアイスブレイクから
-
-function currentPool() {
-  return currentCategory === 'すべて'
-    ? odaiList
-    : odaiList.filter(o => o.cat === currentCategory);
-}
+let categoryCounts = { total: null, byCategory: {} };
 
 function renderFilterChips() {
   const items = ['すべて', ...categories];
@@ -685,7 +589,10 @@ function renderFilterChips() {
       : '';
     return `<button type="button" class="filter-chip${active ? ' active' : ''}" style="${style}" data-cat="${cat}">${cat}</button>`;
   }).join('');
-  countMeta.textContent = `${currentCategory === 'すべて' ? '全' : currentCategory + ' '}${currentPool().length} パターン収録`;
+  const n = currentCategory === 'すべて' ? categoryCounts.total : categoryCounts.byCategory[currentCategory];
+  countMeta.textContent = n == null
+    ? '件数を取得中…'
+    : `${currentCategory === 'すべて' ? '全' : currentCategory + ' '}${n} パターン収録`;
 }
 
 filterRow.addEventListener('click', (e) => {
@@ -696,6 +603,11 @@ filterRow.addEventListener('click', (e) => {
 });
 
 renderFilterChips();
+
+fetch(`${API_BASE}?counts=1`)
+  .then(r => r.json())
+  .then(data => { categoryCounts = data; renderFilterChips(); })
+  .catch(() => { countMeta.textContent = 'サーバーに接続できません(API_BASEの設定を確認してください)'; });
 
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
@@ -742,14 +654,22 @@ function spawnParticles(el) {
   }
 }
 
+// ロール演出用のダミー文字列（実際のお題は含まない。単なる視覚効果）
+const ROLL_CHARS = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんー？！".split('');
+function randomRollText() {
+  const len = 8 + Math.floor(Math.random()*22);
+  let s=''; for(let i=0;i<len;i++) s+=ROLL_CHARS[Math.floor(Math.random()*ROLL_CHARS.length)];
+  return s;
+}
+
+let pendingFetch=null, fetchFailed=false;
+
 function skipAnimation() {
-  if(!isRolling) return; clearInterval(intervalId); finalize();
+  if(!isRolling) return; clearInterval(intervalId); settle();
 }
 
 function drawOdai() {
-  if(isRolling) return; isRolling=true; lotteryDone=false;
-  const pool=currentPool();
-  finalOdai=pool[Math.floor(Math.random()*pool.length)];
+  if(isRolling) return; isRolling=true; lotteryDone=false; fetchFailed=false;
   display.classList.remove('decided'); display.classList.add('rolling');
   wrap.classList.add('rolling'); badge.classList.remove('active');
   badge.textContent='抽選中...'; badge.style.cssText='';
@@ -758,19 +678,35 @@ function drawOdai() {
   progWrap.classList.add('visible'); progBar.style.width='0%';
   footerEl.textContent=''; startSmallBtn.disabled=true;
 
+  pendingFetch = fetch(`${API_BASE}?cat=${encodeURIComponent(currentCategory)}`)
+    .then(r => { if(!r.ok) throw new Error('bad response'); return r.json(); })
+    .catch(() => { fetchFailed=true; return null; });
+
   let count=0, beatPh=0;
   intervalId=setInterval(()=>{
-    const r=pool[Math.floor(Math.random()*pool.length)];
-    display.innerHTML=`<p class="odai-text">${r.text}</p>`; count++;
+    display.innerHTML=`<p class="odai-text">${randomRollText()}</p>`; count++;
     progBar.style.width=`${(count/TOTAL)*100}%`;
     const progress=count/TOTAL, every=Math.max(1,Math.round(1+progress*6));
     if(++beatPh%every===0) playClick(.7+progress*.6);
-    if(count>=TOTAL){clearInterval(intervalId);finalize();}
+    if(count>=TOTAL){clearInterval(intervalId);settle();}
   }, INTERVAL);
 }
 
-function finalize() {
-  isRolling=false; lotteryDone=true;
+function settle() {
+  pendingFetch.then(finalize);
+}
+
+function finalize(odai) {
+  isRolling=false;
+  if(!odai || fetchFailed){
+    display.classList.remove('rolling'); wrap.classList.remove('rolling');
+    display.innerHTML=`<p class="odai-text placeholder-text">サーバーに接続できませんでした。API_BASEの設定・ロリポップ側のCORS設定をご確認ください。</p>`;
+    progWrap.classList.remove('visible');
+    drawBtn.disabled=false; drawBtn.textContent='🎲 もう一度抽選する';
+    skipBtn.classList.remove('visible');
+    return;
+  }
+  finalOdai=odai; lotteryDone=true;
   setDisplay(finalOdai);
   display.classList.remove('rolling'); display.classList.add('decided');
   wrap.classList.remove('rolling');
