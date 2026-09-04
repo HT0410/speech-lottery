@@ -64,6 +64,18 @@
     }
     #category-badge.active { background:rgba(245,200,66,.13); color:var(--accent); border:1px solid rgba(245,200,66,.3); }
 
+    .filter-row {
+      display:flex; flex-wrap:wrap; gap:8px; justify-content:center;
+    }
+    .filter-chip {
+      font-family:'DM Mono',monospace; font-size:.78rem; letter-spacing:.03em;
+      padding:8px 16px; border-radius:100px; cursor:pointer;
+      background:var(--surface); color:var(--muted); border:1px solid var(--border);
+      transition:all .2s;
+    }
+    .filter-chip:hover { color:var(--text); border-color:var(--muted); }
+    .filter-chip.active { color:#0d0f1a; border-color:transparent; font-weight:700; }
+
     .display-wrap { position: relative; }
     .display-wrap::before, .display-wrap::after {
       content:''; position:absolute; width:18px; height:18px;
@@ -296,6 +308,8 @@
     <p class="meta" id="count-meta">— loading —</p>
   </header>
 
+  <div class="filter-row" id="filter-row"></div>
+
   <div class="display-wrap" id="display-wrap">
     <div id="category-badge">CATEGORY</div>
     <div id="odai-display">
@@ -361,6 +375,26 @@
 //  お題リスト（就職・キャリア特化版）
 // =============================================
 const odaiList = [
+  { cat:"アイスブレイク", text:"好きな食べ物とその理由を教えて。" },
+  { cat:"アイスブレイク", text:"最近ハマっていること・マイブームは？" },
+  { cat:"アイスブレイク", text:"出身地のおすすめスポットや自慢できるところは？" },
+  { cat:"アイスブレイク", text:"休日はどんな風に過ごしている？" },
+  { cat:"アイスブレイク", text:"好きな色とその理由を教えて。" },
+  { cat:"アイスブレイク", text:"子供の頃になりたかった職業は？" },
+  { cat:"アイスブレイク", text:"好きな映画・ドラマ・アニメを一つ紹介して。" },
+  { cat:"アイスブレイク", text:"得意料理、または好きな料理は？" },
+  { cat:"アイスブレイク", text:"朝型？夜型？その理由も教えて。" },
+  { cat:"アイスブレイク", text:"旅行してみたい場所はどこ？" },
+  { cat:"アイスブレイク", text:"尊敬する人・憧れの人について話して。" },
+  { cat:"アイスブレイク", text:"最近笑ったエピソードを教えて。" },
+  { cat:"アイスブレイク", text:"ペットや好きな動物について話して。" },
+  { cat:"アイスブレイク", text:"好きな音楽・アーティストを紹介して。" },
+  { cat:"アイスブレイク", text:"一つだけ得意なこと・自慢できることは？" },
+  { cat:"アイスブレイク", text:"この訓練校に入ったきっかけは？" },
+  { cat:"アイスブレイク", text:"イラストレーターを2日間触ってみた感想は？" },
+  { cat:"アイスブレイク", text:"フォトショップを2日間触ってみた感想は？" },
+  { cat:"アイスブレイク", text:"この訓練で一番楽しみにしていることは？" },
+  { cat:"アイスブレイク", text:"今の目標を一言で話して。" },
   { cat:"キャリア", text:"5年後の自分は、どんなエンジニア／デザイナーになっていたい？" },
   { cat:"キャリア", text:"仕事において一番大切にしたい「譲れない条件」は何？" },
   { cat:"キャリア", text:"あなたにとって「プロフェッショナル」とは何か、具体的に定義して。" },
@@ -439,6 +473,7 @@ const odaiList = [
 ];
 
 const catColors = {
+  "アイスブレイク":  "#38bdf8",
   "キャリア":        "#f5c842",
   "就職活動":        "#ff6b6b",
   "スキル・学習":    "#4ecdc4",
@@ -608,7 +643,8 @@ function playTimerEnd() { playJikouLong(4.0); }
 // =============================================
 //  状態
 // =============================================
-document.getElementById('count-meta').textContent = `全 ${odaiList.length} パターン収録`;
+const countMeta = document.getElementById('count-meta');
+const filterRow = document.getElementById('filter-row');
 
 const display  = document.getElementById('odai-display');
 const badge    = document.getElementById('category-badge');
@@ -626,6 +662,40 @@ const fullscreenBtn = document.getElementById('fullscreen-btn');
 let isRolling=false, finalOdai=null, lotteryDone=false;
 const TOTAL=90, INTERVAL=52;
 let intervalId=null;
+
+// =============================================
+//  カテゴリ絞り込み
+// =============================================
+const categories = [...new Set(odaiList.map(o => o.cat))];
+let currentCategory = 'アイスブレイク'; // 最初のラウンドはアイスブレイクから
+
+function currentPool() {
+  return currentCategory === 'すべて'
+    ? odaiList
+    : odaiList.filter(o => o.cat === currentCategory);
+}
+
+function renderFilterChips() {
+  const items = ['すべて', ...categories];
+  filterRow.innerHTML = items.map(cat => {
+    const col = cat === 'すべて' ? '#eef0ff' : (catColors[cat] || '#eef0ff');
+    const active = cat === currentCategory;
+    const style = active
+      ? `background:${col};border-color:${col};box-shadow:0 0 14px ${col}55;`
+      : '';
+    return `<button type="button" class="filter-chip${active ? ' active' : ''}" style="${style}" data-cat="${cat}">${cat}</button>`;
+  }).join('');
+  countMeta.textContent = `${currentCategory === 'すべて' ? '全' : currentCategory + ' '}${currentPool().length} パターン収録`;
+}
+
+filterRow.addEventListener('click', (e) => {
+  const btn = e.target.closest('.filter-chip');
+  if (!btn || isRolling) return;
+  currentCategory = btn.dataset.cat;
+  renderFilterChips();
+});
+
+renderFilterChips();
 
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
@@ -678,7 +748,8 @@ function skipAnimation() {
 
 function drawOdai() {
   if(isRolling) return; isRolling=true; lotteryDone=false;
-  finalOdai=odaiList[Math.floor(Math.random()*odaiList.length)];
+  const pool=currentPool();
+  finalOdai=pool[Math.floor(Math.random()*pool.length)];
   display.classList.remove('decided'); display.classList.add('rolling');
   wrap.classList.add('rolling'); badge.classList.remove('active');
   badge.textContent='抽選中...'; badge.style.cssText='';
@@ -689,7 +760,7 @@ function drawOdai() {
 
   let count=0, beatPh=0;
   intervalId=setInterval(()=>{
-    const r=odaiList[Math.floor(Math.random()*odaiList.length)];
+    const r=pool[Math.floor(Math.random()*pool.length)];
     display.innerHTML=`<p class="odai-text">${r.text}</p>`; count++;
     progBar.style.width=`${(count/TOTAL)*100}%`;
     const progress=count/TOTAL, every=Math.max(1,Math.round(1+progress*6));
