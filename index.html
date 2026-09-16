@@ -76,6 +76,27 @@
     .filter-chip:hover { color:var(--text); border-color:var(--muted); }
     .filter-chip.active { color:#0d0f1a; border-color:transparent; font-weight:700; }
 
+    .student-row { display:flex; justify-content:center; }
+    #student-name {
+      width:100%; max-width:360px; padding:12px 18px; font-size:1rem;
+      font-family:'Zen Kaku Gothic New',sans-serif;
+      background:var(--surface); color:var(--text);
+      border:1px solid var(--border); border-radius:100px; text-align:center;
+    }
+    #student-name:focus { outline:none; border-color:var(--teal); }
+    #student-name::placeholder { color:var(--muted); }
+
+    .record-row { display:flex; flex-direction:column; align-items:center; gap:8px; }
+    #record-btn {
+      padding:16px 28px; font-size:1rem;
+      background:rgba(167,139,250,.15); color:var(--purple);
+      border:1px solid rgba(167,139,250,.3);
+    }
+    #record-btn:hover:not(:disabled) { background:rgba(167,139,250,.25); }
+    #record-status { font-size:.85rem; color:var(--muted); font-family:'DM Mono',monospace; min-height:1.2em; }
+    #record-status.ok { color:var(--teal); }
+    #record-status.err { color:var(--red); }
+
     .display-wrap { position: relative; }
     .display-wrap::before, .display-wrap::after {
       content:''; position:absolute; width:18px; height:18px;
@@ -310,6 +331,10 @@
 
   <div class="filter-row" id="filter-row"></div>
 
+  <div class="student-row">
+    <input type="text" id="student-name" placeholder="受講生の氏名を入力" autocomplete="off">
+  </div>
+
   <div class="display-wrap" id="display-wrap">
     <div id="category-badge">CATEGORY</div>
     <div id="odai-display">
@@ -334,6 +359,11 @@
   </div>
 
   <div id="lottery-footer"></div>
+
+  <div class="record-row">
+    <button id="record-btn" onclick="recordSpeech()" disabled>📝 スピーチ終了を記録する</button>
+    <span id="record-status"></span>
+  </div>
 </div>
 
 <!-- ===== タイマービュー ===== -->
@@ -378,6 +408,10 @@
 
 // ロリポップにアップロードした draw.php の実際のURLに書き換えてください
 const API_BASE = 'https://YOUR-ACCOUNT.lolipop.jp/speech-lottery/draw.php';
+
+// Google Apps Script を「ウェブアプリとしてデプロイ」した後のURLとトークンに書き換えてください
+const SHEETS_API = 'https://script.google.com/macros/s/YOUR-SCRIPT-ID/exec';
+const SHEETS_TOKEN = '5mzRo4ydgjMjpLLKx8GjI0Ki_QdiEiVb';
 
 const categories = ["アイスブレイク","キャリア","就職活動","スキル・学習","チーム・人間関係","自己分析"];
 
@@ -568,6 +602,9 @@ const barDigits= document.getElementById('bar-digits');
 const barLabel = document.getElementById('bar-label');
 const startSmallBtn = document.getElementById('start-small-btn');
 const fullscreenBtn = document.getElementById('fullscreen-btn');
+const studentNameEl = document.getElementById('student-name');
+const recordBtn = document.getElementById('record-btn');
+const recordStatus = document.getElementById('record-status');
 
 let isRolling=false, finalOdai=null, lotteryDone=false;
 const TOTAL=90, INTERVAL=52;
@@ -662,14 +699,38 @@ function randomRollText() {
   return s;
 }
 
-let pendingFetch=null, fetchFailed=false;
+let pendingFetch=null, fetchFailed=false, exhausted=false;
+
+// =============================================
+//  本日の記録済みお題（Google Sheets 側）を取得し、重複を避ける
+// =============================================
+let usedTexts = new Set();
+
+function loadUsedTexts() {
+  return fetch(`${SHEETS_API}?action=used&token=${encodeURIComponent(SHEETS_TOKEN)}`)
+    .then(r => { if(!r.ok) throw new Error('bad response'); return r.json(); })
+    .then(data => { usedTexts = new Set(data.usedTexts || []); })
+    .catch(() => { /* 取得できない場合は重複チェックなしで続行 */ });
+}
+loadUsedTexts();
+
+// 指定カテゴリから、本日まだ使っていないお題が出るまで抽選し直す
+async function fetchUnique(cat, maxTries=30) {
+  for (let i=0; i<maxTries; i++) {
+    const r = await fetch(`${API_BASE}?cat=${encodeURIComponent(cat)}`)
+      .then(r => { if(!r.ok) throw new Error('bad response'); return r.json(); });
+    if (!usedTexts.has(r.text)) return r;
+  }
+  return 'exhausted';
+}
 
 function skipAnimation() {
   if(!isRolling) return; clearInterval(intervalId); settle();
 }
 
 function drawOdai() {
-  if(isRolling) return; isRolling=true; lotteryDone=false; fetchFailed=false;
+  if(isRolling) return; isRolling=true; lotteryDone=false; fetchFailed=false; exhausted=false;
+  recordStatus.textContent=''; recordStatus.className=''; recordBtn.disabled=true;
   display.classList.remove('decided'); display.classList.add('rolling');
   wrap.classList.add('rolling'); badge.classList.remove('active');
   badge.textContent='抽選中...'; badge.style.cssText='';
@@ -678,9 +739,7 @@ function drawOdai() {
   progWrap.classList.add('visible'); progBar.style.width='0%';
   footerEl.textContent=''; startSmallBtn.disabled=true;
 
-  pendingFetch = fetch(`${API_BASE}?cat=${encodeURIComponent(currentCategory)}`)
-    .then(r => { if(!r.ok) throw new Error('bad response'); return r.json(); })
-    .catch(() => { fetchFailed=true; return null; });
+  pendingFetch = fetchUnique(currentCategory).catch(() => { fetchFailed=true; return null; });
 
   let count=0, beatPh=0;
   intervalId=setInterval(()=>{
@@ -698,6 +757,14 @@ function settle() {
 
 function finalize(odai) {
   isRolling=false;
+  if(odai === 'exhausted'){
+    display.classList.remove('rolling'); wrap.classList.remove('rolling');
+    display.innerHTML=`<p class="odai-text placeholder-text">このカテゴリのお題は本日すべて使用済みです。別のカテゴリを選んでください。</p>`;
+    progWrap.classList.remove('visible');
+    drawBtn.disabled=false; drawBtn.textContent='🎲 もう一度抽選する';
+    skipBtn.classList.remove('visible');
+    return;
+  }
   if(!odai || fetchFailed){
     display.classList.remove('rolling'); wrap.classList.remove('rolling');
     display.innerHTML=`<p class="odai-text placeholder-text">サーバーに接続できませんでした。API_BASEの設定・ロリポップ側のCORS設定をご確認ください。</p>`;
@@ -718,12 +785,48 @@ function finalize(odai) {
   footerEl.textContent=`カテゴリ: ${finalOdai.cat}`;
   barLabel.textContent='準備ができたら「スタート」を押してください';
   startSmallBtn.disabled=false;
+  updateRecordBtnState();
 
   // タイマービューのお題をセット
   document.getElementById('tv-mini-cat').textContent=finalOdai.cat;
   document.getElementById('tv-mini-text').textContent=finalOdai.text;
   const col=catColors[finalOdai.cat]||'#fff';
   document.getElementById('tv-mini-cat').style.color=col;
+}
+
+// =============================================
+//  スピーチ終了の記録（Google Sheets へ送信）
+// =============================================
+function updateRecordBtnState() {
+  recordBtn.disabled = !(lotteryDone && studentNameEl.value.trim() !== '');
+}
+studentNameEl.addEventListener('input', updateRecordBtnState);
+
+function recordSpeech() {
+  const name = studentNameEl.value.trim();
+  if(!lotteryDone || !finalOdai || !name) return;
+  recordBtn.disabled=true;
+  recordStatus.className=''; recordStatus.textContent='記録中…';
+
+  fetch(SHEETS_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Apps Scriptのプリフライト回避のためtext/plainで送る
+    body: JSON.stringify({ token: SHEETS_TOKEN, name, cat: finalOdai.cat, text: finalOdai.text }),
+  })
+    .then(r => { if(!r.ok) throw new Error('bad response'); return r.json(); })
+    .then(res => {
+      if(!res || res.ok !== true) throw new Error('record failed');
+      usedTexts.add(finalOdai.text);
+      recordStatus.className='ok';
+      recordStatus.textContent=`「${name}」さんの記録をスプレッドシートに保存しました。`;
+      studentNameEl.value='';
+      updateRecordBtnState();
+    })
+    .catch(() => {
+      recordStatus.className='err';
+      recordStatus.textContent='記録に失敗しました。SHEETS_APIの設定をご確認ください。';
+      recordBtn.disabled=false;
+    });
 }
 
 // =============================================
