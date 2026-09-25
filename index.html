@@ -160,6 +160,15 @@
     }
     #fullscreen-btn:hover { background: var(--border); }
 
+    #seats-link {
+      position: fixed; top: 16px; left: 16px; z-index: 200;
+      padding: 12px 18px; font-size: .95rem; text-decoration: none;
+      background: rgba(22,25,41,.86); color: var(--text);
+      border: 1px solid var(--border); border-radius: 999px;
+      backdrop-filter: blur(8px);
+    }
+    #seats-link:hover { background: var(--border); }
+
     /* ===================== TIMER VIEW ===================== */
     #timer-view {
       display: none;
@@ -298,6 +307,7 @@
 </head>
 <body>
 
+<a id="seats-link" href="seats.html">🪑 席替え抽選</a>
 <button id="fullscreen-btn" type="button" onclick="toggleFullscreen()">全画面</button>
 
 <!-- ===== 抽選ビュー ===== -->
